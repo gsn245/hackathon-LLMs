@@ -1,0 +1,6 @@
+# Ignoring the key from OpenAI
+the-key
+
+*.egg-info
+__pycache__/
+.DS_Store

@@ -1,0 +1,11 @@
+black
+scipy
+tenacity
+tiktoken==0.3.3
+termcolor 
+openai
+requests
+arxiv
+pandas
+PyPDF2
+tqdm
