@@ -1,6 +1,6 @@
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).parent.parent.parent.resolve()
+ROOT_DIR = Path(__file__).parent.parent.parent.parent.resolve()
 
 
 def load_api_key() -> str:
