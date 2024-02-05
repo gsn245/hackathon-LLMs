@@ -1,9 +1,10 @@
 # Starting kit - LLMs
 
-Some loose ideas: Write a bot that has an interface to arxiv/google scholar and
-1. reviews papers (maybe using supervised information from OpenReview).
-2. answers the question "has this idea been done already?"
+Some loose ideas:
+1. reviews papers (maybe using supervised information from OpenReview). Aim: comparing with the NeurIPS experiment.
+2. answers the question "has this idea been done already?" (verify with one's own previous work)
 3. given a methods section, writes the related work section.
+4. Study the bias and ethical concerns that arise from these tasks.
 
 ## Setting up your environment
 
@@ -138,9 +139,132 @@ print(
 
 ### Downloading pdfs from a conference in OpenReview
 
+```python
+from pathlib import Path
 
+# Remember to add your username and password to the-key
+from llms import load_openreview_credentials
 
-### Querying papers from arxiv
+import openreview
+
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.resolve()
+
+username, password = load_openreview_credentials()
+
+# API V2
+client = openreview.api.OpenReviewClient(
+    baseurl="https://api2.openreview.net",
+    username=username,
+    password=password,
+)
+
+# Get the venue id from the URL of the conference
+notes = client.get_all_notes(
+    content={"venueid": "ICLR.cc/2024/Conference"}, details="original"
+)
+
+# Print the title of each paper
+for note in notes:
+    print(note.id, note.content["title"])
+
+# Downloading the first 10 papers
+SAVE_PATH = ROOT_DIR / "data" / "raw" / "downloaded_from_openreview"
+SAVE_PATH.mkdir(parents=True, exist_ok=True)
+for note in notes[:10]:
+    pdf = client.get_pdf(note.id)
+    with open(SAVE_PATH / f"{note.id}.pdf", "wb") as f:
+        f.write(pdf)
+
+```
+
+### Downloading reviews from OpenReview
+
+```python
+from pathlib import Path
+from llms import load_openreview_credentials
+
+import openreview
+
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.resolve()
+
+# Loading the credentials
+username, password = load_openreview_credentials()
+
+# Creating a client for OpenReview
+client = openreview.api.OpenReviewClient(
+    baseurl="https://api2.openreview.net",
+    username=username,
+    password=password,
+)
+
+# Getting all submissions to the conference.
+venue_id = "ICLR.cc/2024/Conference"
+venue_group = client.get_group(venue_id)
+submission_name = venue_group.content["submission_name"]["value"]
+
+# Reference for the schema of submissions:
+# https://docs.openreview.net/reference/api-v2/openapi-definition#notes
+submissions = client.get_all_notes(
+    invitation=f"{venue_id}/-/{submission_name}", details="replies"
+)
+
+review_name = venue_group.content["review_name"]["value"]
+
+# Printing the reviews for the first 10 submissions.
+for submission in submissions[:10]:
+    print("-" * 50)
+    print(submission.id)
+    print(submission.content["title"]["value"])
+
+    for reply in submission.details["replies"]:
+        if (
+            f"{venue_id}/{submission_name}{submission.number}/-/{review_name}"
+            in reply["invitations"]
+        ):
+            # Printing the rating
+            print(reply["content"]["rating"]["value"])
+
+            # Printing the confidence
+            # print(reply["content"]["confidence"]["value"])
+
+```
+
+### Downloading papers from arXiv
+
+```python
+from pathlib import Path
+
+import arxiv
+
+ROOT_DIR = Path(__file__).parent.parent.parent.parent.resolve()
+SAVE_DIR = ROOT_DIR / "data" / "raw" / "downloaded_from_arxiv"
+SAVE_DIR.mkdir(parents=True, exist_ok=True)
+
+# Construct the default API client.
+# The terms of service from arXiv specify that
+# we need to have a delay of 3 seconds between
+# API calls. arxiv.py handles this for us.
+client = arxiv.Client()
+
+# Search for the 5 most recent articles matching the keyword "Bayesian optimization."
+search = arxiv.Search(
+    query="Bayesian optimization",
+    max_results=5,
+    sort_by=arxiv.SortCriterion.SubmittedDate,
+)
+
+results = client.results(search)
+
+for result in results:
+    print("-" * 50)
+    print(result.entry_id + "\n")
+    print(result.title + "\n")
+    print(result.summary + "\n")
+    print(result.pdf_url)
+
+    result.download_pdf(dirpath=SAVE_DIR)
+
+```
 
 ### Computing embeddings of different papers
 

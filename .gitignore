@@ -5,3 +5,4 @@ the-key
 __pycache__/
 .DS_Store
 data/raw/downloaded_from_openreview/
+data/raw/downloaded_from_arxiv/
