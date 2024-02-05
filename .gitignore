@@ -4,3 +4,4 @@ the-key
 *.egg-info
 __pycache__/
 .DS_Store
+data/raw/downloaded_from_openreview/
