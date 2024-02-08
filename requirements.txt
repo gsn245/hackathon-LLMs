@@ -10,3 +10,4 @@ pandas
 PyPDF2
 tqdm
 openreview-py @ git+https://github.com/openreview/openreview-py.git
+scikit-learn

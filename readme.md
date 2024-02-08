@@ -25,7 +25,22 @@ Afterwards, you can install this package with
 pip install -e .
 ```
 
+## Adding your credentials
+
+Ask Miguel for `the-key`, and add your OpenReview credentials to it. Leave the file on the root directory, right next to this readme.
+
 ## Basic examples
+
+You can find these examples inside `examples/basic` in this repository.
+
+- [A simple query to GPT 3.5 or 4](#a-simple-query-to-gpt-354)
+- [Reading a pdf](#reading-a-pdf)
+- [Counting tokens](#counting-tokens)
+- [Passing a pdf to GPT](#passing-a-pdf-to-gpt-354-and-asking-for-a-summary)
+- [Downloading pdfs from OpenReview](#downloading-pdfs-from-a-conference-in-openreview)
+- [Downloading reviews from OpenReview](#downloading-reviews-from-openreview)
+- [Computing embeddings](#computing-embeddings-of-different-papers)
+
 
 ### A simple query to GPT-3.5/4
 
@@ -76,6 +91,10 @@ paper = read_pdf(ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf")
 
 print(score_based[:1000])
 ```
+
+### Counting tokens
+
+[🧑‍🍳 Here's an example from the OpenAI cookbook.](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb)
 
 ### Passing a pdf to GPT-3.5/4 and asking for a summary
 
@@ -266,30 +285,83 @@ for result in results:
 
 ```
 
-### Computing embeddings of different papers
-
-## Intermediate examples
-
-### Chatting with a pdf
-
-### Reviewing a paper w. an LLM
+### Computing embeddings of abstracts from arxiv
 
 ```python
-# TODO: write
+import json
+from pathlib import Path
 
-...
+from openai import OpenAI
+
+import arxiv
+
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+from llms import load_api_key
+
+ROOT_DIR = Path(__file__).parent.parent.parent.parent.resolve()
+SAVE_DIR = ROOT_DIR / "data" / "raw" / "downloaded_from_arxiv"
+SAVE_DIR.mkdir(parents=True, exist_ok=True)
+
+API_KEY = load_api_key()
+
+client_arxiv = arxiv.Client()
+
+# Extracting abstracts from three different topics
+# on arXiv
+abstracts = []
+for query in ["Bayesian Optimization", "Variational inference", "score-based model"]:
+    search = arxiv.Search(
+        query=query,
+        max_results=5,
+        sort_by=arxiv.SortCriterion.SubmittedDate,
+    )
+    results = client_arxiv.results(search)
+    abstracts_ = [result.summary.replace("\n", " ") for result in results]
+
+    abstracts.extend(abstracts_)
+
+client_open_ai = OpenAI(api_key=API_KEY)
+
+# API reference for embeddings:
+# https://beta.openai.com/docs/api-reference/embeddings
+abstract_embeddings = [
+    client_open_ai.embeddings.create(input=[abstract], model="text-embedding-3-small")
+    .data[0]
+    .embedding
+    for abstract in abstracts
+]
+
+print(abstract_embeddings)
+
+with open(SAVE_DIR / "abstracts_and_embeddings.json", "w") as fp:
+    json.dump(
+        {"abstracts": abstracts, "abstract_embeddings": abstract_embeddings},
+        fp,
+    )
+
+# Searching for a relevant abstract given a small prompt
+prompt = "Bayesian Optimization"
+
+# Computing the embedding of the prompt
+prompt_embedding = (
+    client_open_ai.embeddings.create(input=[prompt], model="text-embedding-3-small")
+    .data[0]
+    .embedding
+)
+
+# Computing the similarity between the prompt and the abstracts
+prompt_embedding = np.array(prompt_embedding)
+abstract_embeddings = np.array(abstract_embeddings)
+
+similarities = [
+    cosine_similarity(
+        prompt_embedding.reshape(1, -1), embedding.reshape(1, -1)
+    ).flatten()[0]
+    for embedding in abstract_embeddings
+]
+
+print(similarities)
+print(abstracts[np.argmax(similarities)])
 ```
-
-### TODOs
-
-- Write an interface with OpenReview and arXiv
-- Build a simple prompt-driven review.
-
-## Advanced
-
-### Having an LLM use your Python functions
-
-- 🧑‍🍳 Notebook from the OpenAI Cookbook: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_for_knowledge_retrieval.ipynb
-
-
-## Example: writing a related work section
