@@ -39,7 +39,7 @@ You can find these examples inside `examples/basic` in this repository.
 - [Passing a pdf to GPT](#passing-a-pdf-to-gpt-354-and-asking-for-a-summary)
 - [Downloading pdfs from OpenReview](#downloading-pdfs-from-a-conference-in-openreview)
 - [Downloading reviews from OpenReview](#downloading-reviews-from-openreview)
-- [Computing embeddings](#computing-embeddings-of-different-papers)
+- [Computing embeddings](#computing-embeddings-of-abstracts-from-arxiv)
 
 
 ### A simple query to GPT-3.5/4
