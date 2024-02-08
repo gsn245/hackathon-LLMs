@@ -5,5 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "llms"
 version = "0.0.1"
-description = "..."
+description = "A hackathon starting kit for the LLMs project"
 readme = "readme.md"
+dependencies = [
+    "black",
+    "scipy",
+    "tenacity",
+    "tiktoken==0.3.3",
+    "termcolor",
+    "openai",
+    "arxiv",
+    "pandas",
+    "PyPDF2",
+    "tqdm",
+    "openreview-py@git+https://github.com/openreview/openreview-py.git",
+    "scikit-learn"
+]
