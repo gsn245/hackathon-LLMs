@@ -1,5 +1,8 @@
 # Starting kit - LLMs
 
+> [!WARNING]
+> In this project, you will be interacting with OpenAI's API and large language models. Do not send them any sensitive or private information, from you or any of your colleagues.
+
 Some loose ideas:
 1. reviews papers (maybe using supervised information from OpenReview). Aim: comparing with the NeurIPS experiment.
 2. answers the question "has this idea been done already?" (verify with one's own previous work)
