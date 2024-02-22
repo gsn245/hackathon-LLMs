@@ -34,6 +34,8 @@ Ask Miguel for `the-key`, and add your OpenReview credentials to it. Leave the f
 
 ## Basic examples
 
+Most of these examples are taken and adapted from [the OpenAI cookbook 🧑‍🍳](https://cookbook.openai.com/). 
+
 You can find these examples inside `examples/basic` in this repository.
 
 - [A simple query to GPT 3.5 or 4](#a-simple-query-to-gpt-354)
@@ -99,6 +101,24 @@ print(score_based[:1000])
 
 [🧑‍🍳 Here's an example from the OpenAI cookbook.](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb)
 
+```python
+import tiktoken
+
+GPT_MODEL_NAME = "gpt-3.5-turbo-0125"
+
+# Getting the encoding for a given model:
+encoding = tiktoken.encoding_for_model(GPT_MODEL_NAME)
+
+# Printing the encoding:
+sentence = "I am BayesGPT."
+tokens = encoding.encode(sentence)
+print(f"{sentence} -> {tokens} ({len(tokens)} tokens)")
+
+# Decoding the tokens:
+decoded_sentence = encoding.decode(tokens)
+print(f"{tokens} -> {decoded_sentence}")
+```
+
 ### Passing a pdf to GPT-3.5/4 and asking for a summary
 
 ```python
@@ -107,7 +127,7 @@ from pathlib import Path
 from openai import OpenAI
 from llms import read_pdf, load_api_key, compute_price
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.resolve()
+ROOT_DIR = ...
 GPT_MODEL_NAME = "gpt-3.5-turbo-0125"
 
 API_KEY = load_api_key()
@@ -116,7 +136,10 @@ API_KEY = load_api_key()
 client = OpenAI(api_key=API_KEY)
 
 # Loading the pdf
-paper = read_pdf(ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf")
+paper = read_pdf(
+    ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf",
+    pages=list(range(1, 10)),
+)
 
 # Setting up the prompts
 system_prompt = """
@@ -126,13 +149,12 @@ the paper in bulleted lists, split into three sections:
 core argument, evidence, and conclusions.
 """
 
-# TODO: split paper into chunks of 16k tokens.
 user_prompt = f"""
 The following is a paper on score-based generative modeling. Please summarize the paper in bulleted lists, split into three sections: core argument, evidence, and conclusions.
 
-Paper chunk:
+Paper:
 
-{paper[-40_000:]}
+{paper}
 """
 
 # Querying the model

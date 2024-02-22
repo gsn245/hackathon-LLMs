@@ -12,7 +12,10 @@ API_KEY = load_api_key()
 client = OpenAI(api_key=API_KEY)
 
 # Loading the pdf
-paper = read_pdf(ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf")
+paper = read_pdf(
+    ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf",
+    pages=list(range(1, 10)),
+)
 
 # Setting up the prompts
 system_prompt = """
@@ -26,9 +29,9 @@ core argument, evidence, and conclusions.
 user_prompt = f"""
 The following is a paper on score-based generative modeling. Please summarize the paper in bulleted lists, split into three sections: core argument, evidence, and conclusions.
 
-Paper chunk:
+Paper:
 
-{paper[-40_000:]}
+{paper}
 """
 
 # Querying the model
