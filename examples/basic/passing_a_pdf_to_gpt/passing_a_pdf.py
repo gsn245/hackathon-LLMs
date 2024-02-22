@@ -25,7 +25,6 @@ the paper in bulleted lists, split into three sections:
 core argument, evidence, and conclusions.
 """
 
-# TODO: split paper into chunks of 16k tokens.
 user_prompt = f"""
 The following is a paper on score-based generative modeling. Please summarize the paper in bulleted lists, split into three sections: core argument, evidence, and conclusions.
 
