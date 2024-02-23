@@ -51,6 +51,7 @@ You can find these examples inside `examples/basic` in this repository.
 - [Downloading reviews from OpenReview](#downloading-reviews-from-openreview)
 - [Downloading papers from arXiv](#downloading-papers-from-arxiv)
 - [Computing embeddings of arXiv abstracts](#computing-embeddings-of-abstracts-from-arxiv)
+- [Dealing with rate limits]()
 
 
 ### A simple query to GPT-3.5/4
@@ -61,6 +62,10 @@ from openai import OpenAI
 from llms.api import load_api_key, compute_price
 
 API_KEY = load_api_key()  # Modify it by adding your key here, or get the-key from Miguel.
+
+# All model names can be found in 
+# src/llms/utils/constants/models_and_prices.py
+# or in https://platform.openai.com/docs/models/models
 GPT_MODEL_NAME = "gpt-3.5-turbo-0125"
 
 client = OpenAI(api_key=API_KEY)
@@ -431,4 +436,55 @@ similarities = [
 
 print(similarities)
 print(abstracts[np.argmax(similarities)])
+```
+
+### Dealing with rate limits using `tenacity`
+
+```python
+"""
+Taken from:
+https://platform.openai.com/docs/guides/rate-limits/retrying-with-exponential-backoff
+"""
+from openai import OpenAI
+
+from llms import load_api_key, compute_price
+
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+)
+
+API_KEY = load_api_key()
+client = OpenAI(api_key=API_KEY)
+
+GPT_MODEL_NAME = "gpt-4"
+
+
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+def completion_with_backoff(**kwargs):
+    return client.chat.completions.create(**kwargs)
+
+
+completion = completion_with_backoff(
+    model=GPT_MODEL_NAME,
+    messages=[
+        {
+            "role": "system",
+            "content": "You are BayesGPT, a helpful chat model and a know-it-all of probabilistic modeling.",
+        },
+        {
+            "role": "user",
+            "content": "What is the marginal log-likelihood and why is it important?",
+        },
+    ],
+)
+
+print(completion.choices[0].message.content)
+print(
+    f"input tokens: {completion.usage.prompt_tokens}, "
+    f"output tokens: {completion.usage.completion_tokens}\n"
+    f"Cost: {compute_price(completion)} USD"
+)
 ```
