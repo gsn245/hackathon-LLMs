@@ -51,7 +51,7 @@ You can find these examples inside `examples/basic` in this repository.
 - [Downloading reviews from OpenReview](#downloading-reviews-from-openreview)
 - [Downloading papers from arXiv](#downloading-papers-from-arxiv)
 - [Computing embeddings of arXiv abstracts](#computing-embeddings-of-abstracts-from-arxiv)
-- [Dealing with rate limits]()
+- [Dealing with rate limits](#dealing-with-rate-limits-using-tenacity)
 
 
 ### A simple query to GPT-3.5/4
