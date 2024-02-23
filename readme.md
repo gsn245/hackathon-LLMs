@@ -3,11 +3,15 @@
 > [!WARNING]
 > In this project, you will be interacting with OpenAI's API and large language models. Do not send them any sensitive or private information, from you or any of your colleagues.
 
-Some loose ideas:
-1. reviews papers (maybe using supervised information from OpenReview). Aim: comparing with the NeurIPS experiment.
-2. answers the question "has this idea been done already?" (verify with one's own previous work)
-3. given a methods section, writes the related work section.
-4. Study the bias and ethical concerns that arise from these tasks.
+## Some ideas
+
+Create a bot that
+
+- reviews papers (maybe using supervised information from OpenReview).
+- answers the question "has this idea been done already?"
+- given a methods section, writes the related work section.
+
+Alternatively, you could study the bias and ethical concerns that arise from these tasks, or come up with your own task!
 
 ## Setting up your environment
 
