@@ -139,7 +139,7 @@ from llms.utils.pdf import read_pdf
 ROOT_DIR = ...
 
 # Load the pdf as a string
-paper = read_pdf(ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf")
+score_based = read_pdf(ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf")
 
 print(score_based[:1000])
 ```
