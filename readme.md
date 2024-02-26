@@ -136,7 +136,7 @@ from pathlib import Path
 
 from llms.utils.pdf import read_pdf
 
-ROOT_DIR = ...
+ROOT_DIR = Path("your/path/to/this/project")  # MODIFY THIS
 
 # Load the pdf as a string
 score_based = read_pdf(ROOT_DIR / "data" / "raw" / "example_pdfs" / "score_based.pdf")
@@ -174,7 +174,7 @@ from pathlib import Path
 from openai import OpenAI
 from llms import read_pdf, load_api_key, compute_price
 
-ROOT_DIR = ...
+ROOT_DIR = Path("/your/path/to/this/project")  # MODIFY THIS.
 GPT_MODEL_NAME = "gpt-3.5-turbo-0125"
 
 API_KEY = load_api_key()
